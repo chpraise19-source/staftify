@@ -1,0 +1,3 @@
+import {supabase} from '@/lib/supabase';
+import {z} from 'zod';
+export async function POST(req:Request){try{const {email}=z.object({email:z.email()}).parse(await req.json());const db=await supabase();const origin=process.env.APP_URL;if(!origin) return Response.json({error:'Live sign-in is not configured yet.'},{status:503});const {error}=await db.auth.signInWithOtp({email,options:{emailRedirectTo:new URL('/auth/callback',origin).toString()}});if(error)throw error;return Response.json({ok:true});}catch{return Response.json({error:'Unable to send sign-in link. Check configuration and try again.'},{status:400});}}

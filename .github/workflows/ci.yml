@@ -1,0 +1,27 @@
+name: STAFTIFY checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run typecheck
+      - run: npm run build
+      - run: bash scripts/test-database.sh
+      - run: npx playwright install --with-deps chromium
+      - run: npm start > /tmp/staftify.log 2>&1 &
+      - run: |
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3000 > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          exit 1
+      - run: npx playwright test
