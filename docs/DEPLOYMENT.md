@@ -1,27 +1,13 @@
-# Deployment and account activation
+# Supabase and application activation
 
-The application builds and starts without credentials for demo review. The running cloud process is an internal preview; it is not a publicly deployed website.
+Use only the STAFTIFY project. Fneox must remain untouched.
 
-## Supabase
+Secure settings: `NEXT_PUBLIC_SUPABASE_URL`, the project's public anon key as `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `APP_URL` set to the actual website origin. Server-only credentials such as `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` must never have a NEXT_PUBLIC prefix or be committed. Supabase management authorization (`SUPABASE_ACCESS_TOKEN`) is required for automated hosted migration/configuration through available management APIs.
 
-Connect the STAFTIFY Supabase project and provide `NEXT_PUBLIC_SUPABASE_URL`, its public anon key, and the server-only `SUPABASE_SERVICE_ROLE_KEY` through secure environment configuration. Set `APP_URL` to the actual website origin. Apply `supabase/migrations/202610200001_foundation.sql` once to a new project using its migration tooling. This is the production schema, not the local test bootstrap. Set the Auth Site URL to the website and allow its `/auth/callback` redirect; configure SMTP/email limits for the intended audience.
+Apply migrations `202610200001_foundation.sql` and `202610200002_real_workflows.sql` in order through trusted migration tooling. Do not apply any `tests/*.sql` file to the application project. Auth should require confirmed email, a password of at least 12 characters, the intended APP_URL Site URL and an allowed `/auth/callback` redirect. Configure SMTP and appropriate signup/email rate limits for production.
 
-After the owner signs in, provision that known user's profile as `admin` through trusted project administration. Do not expose an admin bootstrap endpoint or accept an admin role in user metadata. The admin portal can then create facilities, assign existing users to facilities, and record independently verified nursing credentials. Nurses must be verified before applying.
+After the owner's authenticated identity exists, provision its administrator role through trusted project administration. Ordinary users cannot create administrators. Facility owners register and onboard themselves; admin review and a valid subscription are prerequisites for shift publication. Nurses register and submit professional profiles and current licenses for administrator verification. No subscription or credential bypass is included.
 
-## Stripe
+Stripe uses a USD $399 monthly recurring price and signed subscription webhooks. Billing activation remains separate from shift drafting. Configure `STRIPE_PRICE_ID`, server API/signing credentials, a billing portal and webhook subscriptions for customer.subscription.created/updated/deleted. The webhook endpoint is `/api/stripe/webhook`. Verify test billing and cancellation before live charging.
 
-Connect a Stripe test account first. Secure server variables: `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET`. Set `STRIPE_PRICE_ID` to a USD recurring $399/month price. Configure a billing portal and an HTTPS webhook at `/api/stripe/webhook` for `customer.subscription.created`, `customer.subscription.updated`, and `customer.subscription.deleted`. Preserve signature verification and configure webhook retries. Facility subscriptions remain inactive until verified events arrive. STAFTIFY never takes nurse payments.
-
-Validate a real test checkout, webhook activation, payment failure/cancellation, billing portal access, duplicate delivery and final subscription state before switching to live keys. Test checkout/portal links are not generated with invented credentials. Do not put any server secrets in `NEXT_PUBLIC_*` variables.
-
-## Hosting
-
-Vercel is the default proposed host for this Next.js app; a Node.js 24 host is also supported. Import the connected GitHub branch, configure secure environment variables, and build with the repository's standard scripts. A hosting account connection and authorization to deploy are required to publish a preview. Production release also requires approved account configuration, real identity/credential checks, policies and successful connected-service validation.
-
-## What the owner needs to supply
-
-- The Supabase project URL/connection authorization and secure bindings listed above.
-- Stripe test-account authorization and secure server bindings.
-- Hosting account connection and preview deployment authorization.
-
-Never share secret values in chat or commit environment files. The engineer performs installation, migrations, tests and deployment through available authorized tools once access is connected; no local PowerShell/VS Code steps are required.
+Build and run the actual Next.js project with its standard scripts. The root routes users to their real workspace or sign-in. No standalone HTML or sample-data fallback exists. Hosting and account authorization are separate from the local development process; do not claim a public URL until deployment is complete and checked.

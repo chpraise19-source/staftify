@@ -19,11 +19,21 @@ export default function Dialog({
   return (
     <dialog
       ref={ref}
-      className="demo-dialog"
+      className="workspace-dialog"
       aria-label={title}
       onCancel={onClose}
       onClick={(e) => {
-        if (e.target === ref.current) onClose();
+        if (e.target === ref.current) {
+          const box = ref.current?.getBoundingClientRect();
+          if (
+            box &&
+            (e.clientX < box.left ||
+              e.clientX > box.right ||
+              e.clientY < box.top ||
+              e.clientY > box.bottom)
+          )
+            onClose();
+        }
       }}
     >
       <button
@@ -33,7 +43,7 @@ export default function Dialog({
       >
         <X size={20} />
       </button>
-      <span className="eyebrow">STAFTIFY DEMO WORKSPACE</span>
+      <span className="eyebrow">STAFTIFY WORKSPACE</span>
       <h2>{title}</h2>
       {children}
     </dialog>

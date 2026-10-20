@@ -1,3 +1,20 @@
-import Login from '@/components/login';
-import {configured} from '@/lib/supabase';
-export default function Page(){return <Login configured={configured()}/>}
+import AccountForm from "@/components/account-form";
+import { configured } from "@/lib/supabase";
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
+  return (
+    <AccountForm
+      mode="login"
+      configured={configured()}
+      initialError={
+        error === "invalid_link"
+          ? "Your confirmation link expired or is invalid. Sign in again or request another confirmation email."
+          : undefined
+      }
+    />
+  );
+}

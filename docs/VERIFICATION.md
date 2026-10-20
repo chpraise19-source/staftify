@@ -1,23 +1,18 @@
-# Verification
+# Verification of the real application
 
-## Local checks performed
+## Automated checks
 
-- Production build and strict TypeScript check.
-- Three Node tests: valid shift/pay calculation, invalid shift inputs, fractional pay rounding.
-- Five Chromium browser tests: facility demo post/search/CSV, nurse demo application, admin/auth configuration gating, mobile navigation and billing demo disclosure, cross-origin mutation rejection.
-- PostgreSQL 17 migration execution and transactional integration tests: role defaults, denied privilege escalation, cross-facility isolation, subscription-gated insertion, unverified nurse rejection, unique applications, priority/blast notification creation and cooldown, shift acceptance, overlap prevention, OTP redemption, expiry, replay prevention and persisted brute-force attempt limits, timesheet completion/approval, admin actions and stale/duplicate Stripe events.
-- Production dependency audit reported zero known vulnerabilities at installation time.
+- Unit tests: shift/time/rate validation, pay calculation, account-role/password validation, facility onboarding and professional-license validation.
+- Isolated PostgreSQL integration: initial booking/OTP/security checks, then the additive real-workflow migration. Assertions cover email confirmation, untrusted role metadata, idempotent facility onboarding, facility isolation, nurse private license access, draft/edit/publish/cancel, optimistic concurrency, subscription and verification gates, persistent applications/withdrawal/booking, credential-change reverification, cancellation notifications, user suspension and revoked legacy RPC access.
+- Browser checks: real login/registration pages, mobile layout, account-type selection, protected routes/APIs and absence of retired demo routes. Connected-service tests are documented separately when run; none use fake response data to claim real persistence.
+- Production build and strict TypeScript checks.
 
-## Database test harness
+`scripts/test-database.sh` creates a disposable PostgreSQL 17 container, applies test auth-role scaffolding, runs original and new migration assertions, and removes the container. `tests/db-bootstrap.sql` is test-only and must never be applied to Supabase. Test fixtures roll back and are not part of the running application database.
 
-`tests/db-bootstrap.sql` emulates Supabase's auth identity function and database roles on an isolated empty PostgreSQL database. It is only for tests; do not run it on Supabase. Apply the bootstrap, then the production migration, then `tests/database.sql` with `psql -v ON_ERROR_STOP=1`. Assertions fail the process; fixture changes roll back at completion. `scripts/test-database.sh` automates this using a disposable Docker PostgreSQL 17 container.
+## Scope limits
 
-This validates PostgreSQL rules/functions under authenticated roles, not Supabase HTTP/Auth service integration. Hosted Supabase and Stripe calls remain unverified until credentials are supplied. The browser suite tests explicitly labeled demo state, not a pretend live backend.
+Cloud Supabase credentials are not yet provided. Until its migrations and authenticated operations have been exercised, no hosted registration, email delivery or cloud persistence claim is made. Local service validation, if available, is distinct from hosted validation. Stripe test Checkout, webhook delivery and subscription activation remain dependent on connected test account credentials. Production hosting and public port forwarding are not provided by the currently available tools.
 
-## Connected demo update
+## Current run outcome
 
-- 11 Node tests now cover core validation, demo applications, acceptance, schedule overlaps, withdrawals, role checks, credential mismatches, attendance expiry/replay/attempt limits, timesheet approval, administrator actions, notifications, preferences, subscription simulation, cancellation and recovery of invalid saved state.
-- Browser coverage now includes persistent posting/search/pagination/CSV, cross-portal apply/accept, withdrawals and credential gating, complete attendance/approval, priority lists/blasts/notifications/cancellation, admin directory creation/verification/pause/reactivation, reports/preferences/reset, mobile navigation/pricing/dialogs, protected live endpoints, cross-tab state synchronization, and the self-contained preview with external requests blocked.
-- Demo UI defects discovered and fixed: badge text changing accessible navigation names; directory search leaking between sections; Settings being clipped on shorter screens; crypto.randomUUID unavailable on non-secure preview origins. Mobile shift listings now show the full rate/status without horizontal scrolling.
-
-Tests exercise simulated local data. External Supabase, Stripe, Vercel and account integration work is deferred by request. SQL integration checks from the original foundation remain documented above; they were not needed to change the browser-only demo.
+Production build and TypeScript checks passed. Six unit tests and five unauthenticated browser checks passed. The isolated PostgreSQL integration scripts passed, including both migrations. The full real Auth/REST/browser scenario is implemented in `tests/browser/persistent-workflow.spec.ts` but has not executed: it requires an actual isolated Supabase service stack and is explicitly skipped without that configuration. The attempted local Supabase database image could not be extracted within the Docker storage limit, including a smaller supported PostgreSQL version attempt. No hosted credentials are present. This remains an integration-validation blocker, not a passing test or a simulated backend.

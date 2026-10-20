@@ -1,20 +1,28 @@
 "use client";
 import { useState } from "react";
-import { ArrowRight } from "lucide-react";
 import { shiftSchema } from "@/lib/domain";
-import type { Credential, DemoCommand } from "@/lib/demo/store";
-export default function ShiftForm({
-  dispatch,
-  onClose,
+import type { Shift } from "@/lib/types";
+export default function ShiftEditor({
+  shift,
+  onSave,
+  busy,
 }: {
-  dispatch: (command: DemoCommand) => unknown;
-  onClose: () => void;
+  shift?: Shift;
+  onSave: (body: Record<string, unknown>) => Promise<boolean>;
+  busy: boolean;
 }) {
   const [error, setError] = useState("");
+  const localTime = (value: string) => {
+    const d = new Date(value);
+    return new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16);
+  };
   return (
     <form
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
+        setError("");
         const f = new FormData(e.currentTarget);
         const start = new Date(String(f.get("starts_at")));
         const end = new Date(String(f.get("ends_at")));
@@ -22,34 +30,37 @@ export default function ShiftForm({
           !Number.isFinite(start.getTime()) ||
           !Number.isFinite(end.getTime())
         ) {
-          setError("Choose valid start and end times.");
+          setError("Choose valid shift times.");
           return;
         }
-        const shift = {
-          title: String(f.get("title")),
-          specialty: String(f.get("specialty")) as Credential,
-          department: String(f.get("department")),
+        const input = {
+          title: f.get("title"),
+          specialty: f.get("specialty"),
+          department: f.get("department"),
           starts_at: start.toISOString(),
           ends_at: end.toISOString(),
           hourly_rate: Number(f.get("hourly_rate")),
           urgent: f.get("urgent") === "on",
-          notes: String(f.get("notes")),
+          notes: f.get("notes"),
         };
-        const valid = shiftSchema.safeParse(shift);
-        if (!valid.success) {
-          setError(valid.error.issues[0].message);
+        const result = shiftSchema.safeParse(input);
+        if (!result.success) {
+          setError(result.error.issues[0].message);
           return;
         }
-        if (dispatch({ type: "post", shift })) onClose();
+        await onSave(input);
       }}
     >
       <p>
-        Find a great match for your team. This creates a local sample posting.
+        {shift
+          ? "Update this shift’s staffing requirements."
+          : "Prepare a draft shift. Review it before publishing to verified nurses."}
       </p>
       <label>
         Shift title
         <input
           name="title"
+          defaultValue={shift?.title}
           placeholder="Registered Nurse · Med/Surg"
           minLength={3}
           maxLength={120}
@@ -60,7 +71,7 @@ export default function ShiftForm({
       <div className="form-grid">
         <label>
           Credential
-          <select name="specialty">
+          <select name="specialty" defaultValue={shift?.specialty ?? "RN"}>
             <option>RN</option>
             <option>LPN</option>
             <option>CNA</option>
@@ -69,30 +80,30 @@ export default function ShiftForm({
         <label>
           Hourly rate (USD)
           <input
-            type="number"
             name="hourly_rate"
+            type="number"
             min={15}
             max={500}
             step="0.01"
-            defaultValue={52}
+            defaultValue={shift?.hourly_rate}
             required
           />
         </label>
         <label>
           Start date & time
           <input
-            name="starts_at"
-            aria-label="Start date and time"
             type="datetime-local"
+            name="starts_at"
+            defaultValue={shift ? localTime(shift.starts_at) : undefined}
             required
           />
         </label>
         <label>
           End date & time
           <input
-            name="ends_at"
-            aria-label="End date and time"
             type="datetime-local"
+            name="ends_at"
+            defaultValue={shift ? localTime(shift.ends_at) : undefined}
             required
           />
         </label>
@@ -101,21 +112,24 @@ export default function ShiftForm({
         Department
         <input
           name="department"
-          placeholder="Medical / Surgical"
-          maxLength={100}
+          defaultValue={shift?.department}
+          minLength={2}
+          maxLength={120}
           required
         />
       </label>
       <label>
-        Shift notes
+        Shift requirements & notes
         <textarea
           name="notes"
+          defaultValue={shift?.notes}
           maxLength={2000}
-          placeholder="Unit details and required experience. Do not include patient information."
+          placeholder="Unit details, experience and requirements. Do not include patient information."
         />
       </label>
       <label className="checkbox">
-        <input type="checkbox" name="urgent" /> Mark as urgent
+        <input name="urgent" type="checkbox" defaultChecked={shift?.urgent} />
+        Urgent coverage needed
       </label>
       {error && (
         <p className="form-error" role="alert">
@@ -123,10 +137,11 @@ export default function ShiftForm({
         </p>
       )}
       <p className="notice">
-        Facilities pay nurses directly. Demo actions never create real bookings.
+        Your facility pays the assigned nurse directly. All times use your
+        device’s local timezone.
       </p>
-      <button className="primary" type="submit">
-        Add demo shift <ArrowRight size={16} />
+      <button className="primary" disabled={busy}>
+        {busy ? "Saving…" : shift ? "Save changes" : "Save draft shift"}
       </button>
     </form>
   );

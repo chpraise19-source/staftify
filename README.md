@@ -1,25 +1,23 @@
 # STAFTIFY
 
-Healthcare staffing platform built with Next.js App Router, TypeScript, Tailwind CSS, Supabase, and Stripe. Facilities pay nurses directly; STAFTIFY charges facilities **$399 USD/month**.
+A Next.js, TypeScript, Tailwind CSS and Supabase healthcare staffing application. Facilities pay nurses directly; STAFTIFY collects facility subscription fees through Stripe.
 
-## Current application
+## Real application routes
 
-- `/`: labeled interactive facility demo (sample data, no real bookings).
-- `/demo/facility`, `/demo/nurse`, `/demo/admin`: responsive role previews.
-- `/login`: Supabase email-link authentication.
-- `/dashboard`: authenticated workspace; role comes from the database, never a user-selected URL.
-- Facility: post shifts, review/accept applications, priority nurses, urgent in-app notifications, attendance codes, timesheet approval, reports, subscription checkout and billing portal.
-- Nurse: browse shifts, apply, review applications, enter attendance codes, view timesheets.
-- Admin: directory, facility creation/assignment, manual credential verification, subscription status, timesheets and reports.
+- `/` opens the authenticated workspace or redirects to sign-in.
+- `/register`: facility or nurse email/password registration with email confirmation.
+- `/login`: real Supabase authentication; no sample accounts or role switching.
+- `/onboarding`: confirmed account setup. Facility registration creates a facility owned by that user. Nurse registration creates a professional account. Administrator access is never public.
+- `/dashboard`: role-specific workspace loaded from PostgreSQL through authenticated APIs and row-level security.
 
-## Development
+Facility workflows include draft shift creation/editing, publication, cancellation, application approval/booking, urgent in-app blasts, priority nurses, OTP attendance codes and timesheet approval. Nurse workflows include professional profiles, private licensing details, shift search, applications, confirmed schedules, attendance and timesheets. Administrators review facilities and licenses and can suspend non-administrator accounts.
 
-Node.js 24 and npm. `npm ci`, `npm run dev`; production uses `npm run build` and `npm start`. Copy `.env.example` into an ignored local environment file only when configuring real services. With no credentials, demo pages work and live actions fail closed. Demo changes persist in browser localStorage and are shared across the three portals and tabs. Settings → Reset demo workspace restores the sample data. No external accounts are needed for the demo.
+The application shows empty states for empty database tables and connection errors for failed queries. Standalone HTML exports, sample data, localStorage simulators and demo routes have been removed.
 
-`npm test` runs domain validation, pay calculations, and demo workflow tests. `npm run typecheck` checks TypeScript. Browser tests run with `npx playwright test` against a running server; set `CHROMIUM_PATH` to use an existing Chromium binary, or install the Playwright-managed browser. See [verification](docs/VERIFICATION.md) for database tests and actual results.
+## Run and validate
 
-See [architecture](docs/ARCHITECTURE.md) and [deployment](docs/DEPLOYMENT.md) for security boundaries, infrastructure, and remaining activation steps. No source from another project was used or changed.
+Node.js 24. Standard scripts: `npm ci`, `npm run build`, `npm start` (or `npm run dev`). Configure Supabase through secure environment variables listed in `.env.example`. Never commit local environment files. Apply both SQL migrations in order to the intended STAFTIFY project. See [deployment](docs/DEPLOYMENT.md), [architecture](docs/ARCHITECTURE.md) and [verification](docs/VERIFICATION.md).
 
-## Interactive preview
+Checks: `npm test`, `npm run typecheck`, `npm run build`, `bash scripts/test-database.sh`, and `npm run test:browser` against the running app. PostgreSQL tests use an isolated disposable database and never seed the application database. CI runs these same check categories.
 
-The connected demo is the default experience. It includes realistic sample nurses, facilities, applications, weekly schedules, attendance codes, approvable timesheets, directories, notifications, reports, and preferences. See [demo guide](docs/DEMO.md). `npm run preview:export` creates a self-contained HTML preview at `preview/dist/staftify-demo.html`; it contains its own scripts, styles, and icons and makes no network requests. A public hosting URL is intentionally deferred.
+Publication requires facility verification plus an active/trialing subscription. Nurses require manually verified matching credentials and an unexpired license before applying or being booked. No UI toggle bypasses billing or verification.

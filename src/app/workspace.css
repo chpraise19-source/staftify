@@ -1,206 +1,188 @@
-/* Connected browser-only demo workspace */
-.demo-workspace {
+/* Persistent staffing workspace */
+.live-workspace {
   font-size: 14px;
 }
-.demo-workspace .sidebar {
+.live-workspace .sidebar {
   padding-top: 27px;
 }
-.demo-workspace .workspace {
+.live-workspace .workspace {
   margin-top: 26px;
   margin-bottom: 20px;
 }
-.demo-workspace nav {
+.live-workspace nav {
   gap: 2px;
 }
-.demo-workspace nav button {
+.live-workspace nav button {
   padding-block: 11px;
   font-size: 12px;
 }
-.demo-workspace .sidebar-bottom {
+.live-workspace .sidebar-bottom {
   padding-top: 20px;
 }
-.demo-workspace .care-card {
+.live-workspace .care-card {
   margin-bottom: 12px;
 }
-.demo-workspace .care-card > strong {
+.live-workspace .care-card > strong {
   vertical-align: middle;
 }
-.demo-workspace .care-card > svg {
+.live-workspace .care-card > svg {
   vertical-align: middle;
   margin-bottom: 0;
 }
-.demo-workspace .user {
+.live-workspace .user {
   margin-top: 12px;
 }
-.demo-workspace .demo-banner button {
-  padding: 6px 10px;
-  border-radius: 5px;
-  font-size: 10px;
-  color: #788a7b;
-}
-.demo-workspace .demo-banner button.selected {
-  background: #e5f0e8;
-  color: #167256;
-  font-weight: 600;
-}
-.demo-workspace .page-heading p {
+.live-workspace .page-heading p {
   font-size: 12px;
   line-height: 1.6;
 }
-.demo-workspace .page-heading .eyebrow {
+.live-workspace .page-heading .eyebrow {
   font-size: 9px;
 }
-.demo-workspace .primary,
-.demo-workspace .secondary {
+.live-workspace .primary,
+.live-workspace .secondary {
   font-size: 11px;
 }
-.demo-workspace .stat > div > span {
+.live-workspace .stat > div > span {
   font-size: 11px;
 }
-.demo-workspace .stat > small {
+.live-workspace .stat > small {
   font-size: 9px;
   line-height: 1.5;
 }
-.demo-workspace .panel h2 {
+.live-workspace .panel h2 {
   font-size: 15px;
 }
-.demo-workspace .panel-heading p {
+.live-workspace .panel-heading p {
   font-size: 11px;
   line-height: 1.5;
 }
-.demo-workspace .hero-label {
+.live-workspace .hero-label {
   font-size: 9px;
 }
-.demo-workspace .hero p {
+.live-workspace .hero p {
   font-size: 12px;
   max-width: 430px;
   line-height: 1.7;
 }
-.demo-workspace .hero button {
+.live-workspace .hero button {
   font-size: 11px;
 }
-.demo-workspace .hero {
+.live-workspace .hero {
   min-height: 250px;
 }
-.demo-workspace .shift-row {
+.live-workspace .shift-row {
   min-height: 88px;
 }
-.demo-workspace .shift-title small {
+.live-workspace .shift-title small {
   font-size: 10px;
   line-height: 1.5;
   flex-wrap: wrap;
   gap: 4px;
 }
-.demo-workspace .shift-date strong {
+.live-workspace .shift-date strong {
   font-size: 11px;
 }
-.demo-workspace .shift-date small,
-.demo-workspace .rate > small {
+.live-workspace .shift-date small,
+.live-workspace .rate > small {
   font-size: 9px;
   line-height: 1.5;
 }
-.demo-workspace .shift-title em {
+.live-workspace .shift-title em {
   font-size: 8px;
 }
-.demo-workspace .rate strong {
+.live-workspace .rate strong {
   font-size: 14px;
 }
-.demo-workspace .table-header {
+.live-workspace .table-header {
   font-size: 8px;
 }
-.demo-workspace .badge {
+.live-workspace .badge {
   font-size: 10px;
   padding: 5px 8px;
   white-space: normal;
   text-align: center;
   line-height: 1.3;
 }
-.demo-workspace .table-tools {
+.live-workspace .table-tools {
   flex-wrap: wrap;
 }
-.demo-workspace .tabs button {
+.live-workspace .tabs button {
   font-size: 10px;
   padding: 7px 10px;
 }
-.demo-workspace .search input {
+.live-workspace .search input {
   font-size: 11px;
   width: 125px;
   min-width: 0;
 }
-.demo-workspace .text-button {
+.live-workspace .text-button {
   font-size: 10px;
 }
-.demo-workspace .table-header,
-.demo-workspace .shift-row {
+.live-workspace .table-header,
+.live-workspace .shift-row {
   grid-template-columns: minmax(195px, 2fr) minmax(120px, 1.2fr) 70px 76px 16px;
   min-width: 590px;
   padding-inline: 18px;
   gap: 10px;
 }
-.demo-workspace .quick-panel strong {
+.live-workspace .quick-panel strong {
   font-size: 11px;
 }
-.demo-workspace .quick-panel small {
+.live-workspace .quick-panel small {
   font-size: 9px;
   line-height: 1.5;
 }
-.demo-workspace .quick-panel > button {
+.live-workspace .quick-panel > button {
   padding-block: 15px;
 }
-.demo-workspace .nurse strong {
+.live-workspace .nurse strong {
   font-size: 11px;
 }
-.demo-workspace .nurse small {
+.live-workspace .nurse small {
   font-size: 9px;
   line-height: 1.5;
 }
-.demo-workspace .network-panel > p {
+.live-workspace .network-panel > p {
   font-size: 10px;
   line-height: 1.5;
 }
-.demo-workspace .network-link {
+.live-workspace .network-link {
   font-size: 10px;
 }
-.demo-workspace .table-footer {
+.live-workspace .table-footer {
   font-size: 10px;
   gap: 8px;
 }
-.demo-workspace .page-number {
+.live-workspace .page-number {
   font-size: 10px;
   padding: 5px 8px;
   border-radius: 5px;
   background: #f1f5ef;
 }
-.demo-workspace .footer {
+.live-workspace .footer {
   font-size: 9px;
 }
-.demo-workspace .footer > button {
+.live-workspace .footer > button {
   display: flex;
   align-items: center;
   gap: 7px;
   color: #8ca087;
 }
-.demo-user-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #92b79c;
-  margin-left: auto;
-}
-.demo-filter-row {
+.shift-filter-row {
   padding: 0 20px 15px;
   display: flex;
   align-items: end;
   gap: 12px;
 }
-.demo-filter-row > label {
+.shift-filter-row > label {
   font-size: 9px;
   color: #8a9c89;
   display: flex;
   gap: 7px;
   align-items: center;
 }
-.demo-filter-row select,
+.shift-filter-row select,
 .directory-tools select,
 .resource-heading select {
   border: 1px solid #e1e8dc;
@@ -237,25 +219,7 @@
   color: var(--green);
   text-decoration: underline;
 }
-.demo-loading {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  justify-content: center;
-  align-items: center;
-  padding: 25px;
-  text-align: center;
-  color: #518369;
-}
-.demo-loading h1 {
-  font-size: 26px;
-}
-.demo-loading p {
-  font-size: 13px;
-  color: #839681;
-}
-.demo-dialog {
+.workspace-dialog {
   padding: 32px;
   border: 1px solid #dbe5d9;
   border-radius: 14px;
@@ -267,41 +231,41 @@
   box-shadow: 0 18px 90px #18332233;
   overflow: auto;
 }
-.demo-dialog::backdrop {
+.workspace-dialog::backdrop {
   background: #0a2b2180;
   backdrop-filter: blur(4px);
 }
-.demo-dialog h2 {
+.workspace-dialog h2 {
   font-size: 26px;
   line-height: 1.3;
   margin: 12px 28px 14px 0;
   letter-spacing: -0.5px;
 }
-.demo-dialog h3 {
+.workspace-dialog h3 {
   font-size: 14px;
   margin: 24px 0 10px;
 }
-.demo-dialog p {
+.workspace-dialog p {
   font-size: 12px;
   color: #7b8e7c;
   line-height: 1.8;
 }
-.demo-dialog .modal-close {
+.workspace-dialog .modal-close {
   position: absolute;
 }
-.demo-dialog label {
+.workspace-dialog label {
   font-size: 12px;
 }
-.demo-dialog input,
-.demo-dialog textarea,
-.demo-dialog select {
+.workspace-dialog input,
+.workspace-dialog textarea,
+.workspace-dialog select {
   font-size: 13px;
 }
-.demo-dialog .heading-actions {
+.workspace-dialog .heading-actions {
   flex-wrap: wrap;
 }
-.demo-dialog .primary,
-.demo-dialog .secondary {
+.workspace-dialog .primary,
+.workspace-dialog .secondary {
   font-size: 12px;
 }
 .form-error {
@@ -326,7 +290,7 @@
 .resource-heading select {
   min-width: 135px;
 }
-.demo-workspace .resource-panel h2 {
+.live-workspace .resource-panel h2 {
   font-size: 21px;
 }
 .directory-tools {
@@ -890,10 +854,10 @@
   flex-shrink: 0;
   border-radius: 50%;
 }
-.demo-workspace .billing-panel h2 {
+.live-workspace .billing-panel h2 {
   font-size: 34px;
 }
-.demo-workspace .billing-panel > p {
+.live-workspace .billing-panel > p {
   line-height: 1.8;
 }
 .preferences-panel {
@@ -983,16 +947,16 @@
 .nav-overlay {
   display: none;
 }
-.demo-workspace .toast {
+.live-workspace .toast {
   z-index: 90;
 }
-.demo-workspace .top-actions .notification-button {
+.live-workspace .top-actions .notification-button {
   height: 36px;
   width: 36px;
   display: grid;
   place-items: center;
 }
-.demo-workspace .top-actions .notification-button i {
+.live-workspace .top-actions .notification-button i {
   right: 7px;
   top: 6px;
 }
@@ -1005,18 +969,18 @@
   font-size: 12px !important;
 }
 @media (min-width: 1600px) {
-  .demo-workspace .main {
+  .live-workspace .main {
     padding-top: 30px;
   }
-  .demo-workspace .hero {
+  .live-workspace .hero {
     min-height: 270px;
   }
 }
 @media (max-width: 1200px) {
-  .demo-workspace .content-grid {
+  .live-workspace .content-grid {
     grid-template-columns: minmax(0, 1fr) 235px;
   }
-  .demo-workspace .heading-actions {
+  .live-workspace .heading-actions {
     flex-wrap: wrap;
   }
   .attendance-layout {
@@ -1028,21 +992,21 @@
   .reports-grid .resource-panel {
     margin-bottom: 0;
   }
-  .demo-workspace .resource-panel {
+  .live-workspace .resource-panel {
     padding: 22px;
   }
-  .demo-workspace .hero p {
+  .live-workspace .hero p {
     max-width: 290px;
   }
-  .demo-workspace .hero-art {
+  .live-workspace .hero-art {
     width: 42%;
   }
 }
 @media (max-width: 1000px) {
-  .demo-workspace .content-grid {
+  .live-workspace .content-grid {
     grid-template-columns: 1fr;
   }
-  .demo-workspace .right-column {
+  .live-workspace .right-column {
     display: grid;
     grid-template-columns: 1fr 1fr;
   }
@@ -1059,15 +1023,15 @@
     width: 100%;
     margin: 5px 0 0;
   }
-  .demo-workspace .hero-art {
+  .live-workspace .hero-art {
     width: 37%;
   }
-  .demo-workspace .hero-art .floating-chip.top {
+  .live-workspace .hero-art .floating-chip.top {
     display: none;
   }
 }
 @media (max-width: 760px) {
-  .demo-workspace .sidebar.visible {
+  .live-workspace .sidebar.visible {
     box-shadow: 8px 0 35px #1232;
     z-index: 50;
     width: 245px;
@@ -1081,84 +1045,73 @@
     background: #17382b66;
     z-index: 40;
   }
-  .demo-workspace .sidebar .sidebar-bottom {
+  .live-workspace .sidebar .sidebar-bottom {
     padding-top: 25px;
   }
-  .demo-workspace .sidebar .care-card {
+  .live-workspace .sidebar .care-card {
     display: none;
   }
-  .demo-workspace .demo-banner {
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  .demo-workspace .demo-banner > span {
-    font-size: 8px;
-  }
-  .demo-workspace .demo-banner button {
-    padding: 6px 8px;
-    font-size: 10px;
-  }
-  .demo-workspace .hero {
+  .live-workspace .hero {
     padding: 24px;
     min-height: 240px;
   }
-  .demo-workspace .hero p {
+  .live-workspace .hero p {
     max-width: 245px;
     font-size: 11px;
   }
-  .demo-workspace .hero-art {
+  .live-workspace .hero-art {
     width: 30%;
   }
-  .demo-workspace .hero h2 {
+  .live-workspace .hero h2 {
     font-size: 27px;
   }
-  .demo-workspace .primary,
-  .demo-workspace .secondary {
+  .live-workspace .primary,
+  .live-workspace .secondary {
     font-size: 11px;
     padding: 11px 12px;
   }
-  .demo-workspace .page-heading {
+  .live-workspace .page-heading {
     gap: 17px;
   }
-  .demo-workspace .page-heading h1 {
+  .live-workspace .page-heading h1 {
     font-size: 26px;
   }
-  .demo-workspace .page-heading p {
+  .live-workspace .page-heading p {
     font-size: 11px;
   }
-  .demo-workspace .panel-heading {
+  .live-workspace .panel-heading {
     gap: 12px;
   }
-  .demo-workspace .panel-heading h2 {
+  .live-workspace .panel-heading h2 {
     font-size: 14px;
   }
-  .demo-workspace .panel-heading p {
+  .live-workspace .panel-heading p {
     font-size: 10px;
   }
-  .demo-workspace .table-tools {
+  .live-workspace .table-tools {
     gap: 8px;
   }
-  .demo-workspace .search input {
+  .live-workspace .search input {
     width: 90px;
     font-size: 11px;
   }
-  .demo-workspace .tabs button {
+  .live-workspace .tabs button {
     font-size: 10px;
     padding: 7px 8px;
   }
-  .demo-workspace .right-column {
+  .live-workspace .right-column {
     grid-template-columns: 1fr;
   }
-  .demo-workspace .stat {
+  .live-workspace .stat {
     padding: 15px;
   }
-  .demo-workspace .stat > div > span {
+  .live-workspace .stat > div > span {
     font-size: 11px;
   }
-  .demo-workspace .stat > small {
+  .live-workspace .stat > small {
     font-size: 8px;
   }
-  .demo-workspace .resource-panel {
+  .live-workspace .resource-panel {
     padding: 22px 18px;
   }
   .resource-heading {
@@ -1197,8 +1150,8 @@
   .application-actions {
     gap: 7px;
   }
-  .demo-workspace .application-actions .primary,
-  .demo-workspace .application-actions .secondary {
+  .live-workspace .application-actions .primary,
+  .live-workspace .application-actions .secondary {
     padding: 9px;
     font-size: 10px;
   }
@@ -1261,10 +1214,10 @@
   .report-summary span {
     font-size: 9px;
   }
-  .demo-dialog {
+  .workspace-dialog {
     padding: 25px 22px;
   }
-  .demo-dialog h2 {
+  .workspace-dialog h2 {
     font-size: 23px;
   }
   .detail-grid {
@@ -1273,70 +1226,70 @@
   .detail-grid strong {
     font-size: 12px;
   }
-  .demo-workspace .footer {
+  .live-workspace .footer {
     font-size: 8px;
     gap: 12px;
     line-height: 1.8;
   }
-  .demo-workspace .footer > button {
+  .live-workspace .footer > button {
     font-size: 8px;
   }
-  .demo-workspace .toast {
+  .live-workspace .toast {
     font-size: 12px;
     line-height: 1.7;
     padding: 14px 15px;
   }
-  .demo-workspace .table-footer {
+  .live-workspace .table-footer {
     font-size: 9px;
   }
-  .demo-workspace .table-footer .page-number {
+  .live-workspace .table-footer .page-number {
     font-size: 9px;
   }
-  .demo-workspace .billing-panel h2 {
+  .live-workspace .billing-panel h2 {
     font-size: 29px;
   }
 }
 @media (max-width: 760px) {
-  .demo-workspace .shift-table {
+  .live-workspace .shift-table {
     overflow: visible;
   }
-  .demo-workspace .table-header {
+  .live-workspace .table-header {
     display: none;
   }
-  .demo-workspace .shift-row {
+  .live-workspace .shift-row {
     min-width: 0;
     grid-template-columns: 1fr auto;
     gap: 14px 10px;
     padding: 20px 18px;
   }
-  .demo-workspace .shift-title {
+  .live-workspace .shift-title {
     grid-column: 1 / -1;
     min-width: 0;
   }
-  .demo-workspace .shift-title small {
+  .live-workspace .shift-title small {
     font-size: 10px;
   }
-  .demo-workspace .shift-name {
+  .live-workspace .shift-name {
     font-size: 12px;
   }
-  .demo-workspace .shift-date {
+  .live-workspace .shift-date {
     grid-column: 1;
     grid-row: 2;
     padding-left: 2px;
   }
-  .demo-workspace .shift-date small {
+  .live-workspace .shift-date small {
     font-size: 10px;
   }
-  .demo-workspace .rate {
+  .live-workspace .rate {
     grid-column: 2;
     grid-row: 2;
     text-align: right;
   }
-  .demo-workspace .shift-row > .badge {
+  .live-workspace .shift-row > .badge {
     grid-column: 1;
     grid-row: 3;
   }
-  .demo-workspace .row-action {
+  .live-workspace .row-action {
     grid-column: 2;
     grid-row: 3;
     justify-self: end;
@@ -1348,13 +1301,501 @@
     place-items: center;
   }
 }
-.demo-workspace .sidebar {
+.live-workspace .sidebar {
   overflow-y: auto;
   scrollbar-width: thin;
 }
-.demo-workspace .sidebar > .brand,
-.demo-workspace .sidebar > .workspace,
-.demo-workspace .sidebar > nav,
-.demo-workspace .sidebar > .sidebar-bottom {
+.live-workspace .sidebar > .brand,
+.live-workspace .sidebar > .workspace,
+.live-workspace .sidebar > nav,
+.live-workspace .sidebar > .sidebar-bottom {
   flex-shrink: 0;
+}
+/* Real account registration and live workspace states */
+.account-page {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: 43% 57%;
+  background: #fafbf9;
+}
+.account-story {
+  padding: 38px 48px;
+  background: #e8f0e2;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  position: relative;
+  overflow: hidden;
+}
+.account-story:after {
+  content: "+";
+  position: absolute;
+  bottom: 10%;
+  right: -40px;
+  font-size: 300px;
+  font-weight: 800;
+  color: #d3e1c860;
+  transform: rotate(-12deg);
+  pointer-events: none;
+}
+.account-story .brand {
+  position: relative;
+  z-index: 1;
+}
+.story-content {
+  margin: auto 0;
+  padding: 65px 0;
+  position: relative;
+  z-index: 1;
+}
+.story-content .eyebrow {
+  color: #829975;
+  font-size: 10px;
+}
+.story-content h1 {
+  font-family: Georgia, serif;
+  font-size: clamp(36px, 4vw, 58px);
+  line-height: 1.15;
+  font-weight: 400;
+  color: #3d6440;
+  letter-spacing: -1.5px;
+  margin: 20px 0 24px;
+}
+.story-content > p {
+  font-size: 14px;
+  color: #7e9274;
+  line-height: 1.8;
+  max-width: 340px;
+  margin-bottom: 45px;
+}
+.story-feature {
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+  color: #87a079;
+  margin-top: 25px;
+  max-width: 350px;
+}
+.story-feature strong {
+  display: block;
+  font-size: 13px;
+  color: #5c7b50;
+  margin-bottom: 8px;
+}
+.story-feature span {
+  font-size: 12px;
+  line-height: 1.8;
+  color: #8ca17d;
+  display: block;
+}
+.story-feature > svg {
+  flex-shrink: 0;
+}
+.account-story > small {
+  font-size: 10px;
+  color: #91a481;
+  line-height: 1.8;
+  position: relative;
+  z-index: 1;
+}
+.account-main {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding: 35px 48px;
+}
+.account-top {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  align-items: center;
+  font-size: 11px;
+  color: #94a08c;
+  flex-wrap: wrap;
+}
+.account-top a {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  color: #437b50;
+  font-weight: 600;
+}
+.account-card {
+  max-width: 430px;
+  width: 100%;
+  margin: auto;
+  padding: 55px 0;
+}
+.account-card > .eyebrow {
+  font-size: 9px;
+}
+.account-card h2 {
+  font-family: Georgia, serif;
+  font-size: 36px;
+  letter-spacing: -0.8px;
+  font-weight: 400;
+  color: #3f6442;
+  margin: 14px 0;
+}
+.account-card > p {
+  font-size: 12px;
+  color: #8d9d81;
+  line-height: 1.8;
+}
+.account-card form {
+  margin-top: 24px;
+}
+.account-card label {
+  font-size: 12px;
+  margin: 20px 0;
+  color: #6e8262;
+}
+.account-card input {
+  font-size: 13px;
+  padding: 13px;
+  border-color: #dce5d5;
+  background: #fff;
+}
+.account-card .primary {
+  width: 100%;
+  font-size: 12px;
+  padding: 14px;
+  margin-top: 12px;
+}
+.account-type {
+  display: flex;
+  border: 1px solid #dae5d2;
+  border-radius: 7px;
+  background: #f0f4eb;
+  padding: 4px;
+  gap: 3px;
+  margin: 24px 0;
+}
+.account-type button {
+  flex: 1;
+  font-size: 11px;
+  color: #8c9b80;
+  padding: 11px 8px;
+  border-radius: 5px;
+}
+.account-type button.selected {
+  background: white;
+  color: #407247;
+  box-shadow: 0 1px 5px #2f4e2310;
+  font-weight: 600;
+}
+.connection-notice {
+  display: flex;
+  gap: 10px;
+  padding: 15px;
+  border: 1px solid #e4dac1;
+  border-radius: 7px;
+  background: #fffaf0;
+  color: #a28b5c;
+  margin: 22px 0;
+  align-items: flex-start;
+}
+.connection-notice > svg {
+  flex-shrink: 0;
+}
+.connection-notice strong {
+  font-size: 11px;
+}
+.connection-notice p {
+  font-size: 11px;
+  line-height: 1.8;
+  color: #9f947b;
+  margin: 6px 0 0;
+}
+.account-footnote {
+  font-size: 10px !important;
+  line-height: 1.9 !important;
+  margin: 25px 0 0;
+}
+.account-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  color: #a5af9d;
+  font-size: 9px;
+  line-height: 1.7;
+}
+.success-message {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 14px 17px;
+  background: #eff6e9;
+  border: 1px solid #dbe9d0;
+  color: #597e48;
+  border-radius: 7px;
+  font-size: 12px;
+  line-height: 1.8;
+  margin: 15px 0;
+}
+.form-error {
+  font-size: 12px;
+  line-height: 1.8;
+}
+.onboarding-page {
+  min-height: 100dvh;
+  background: #f5f8f1;
+  padding: 35px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.onboarding-card {
+  width: 100%;
+  max-width: 560px;
+  background: white;
+  border: 1px solid #dde7d4;
+  border-radius: 12px;
+  padding: 35px;
+  margin: 35px 0;
+  box-shadow: 0 15px 70px #4b663307;
+}
+.onboarding-card > .workspace-icon {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 25px;
+  align-items: center;
+  justify-content: center;
+}
+.onboarding-card h1 {
+  font-family: Georgia, serif;
+  font-size: 34px;
+  color: #466a3b;
+  font-weight: 400;
+  margin-top: 15px;
+  line-height: 1.25;
+}
+.onboarding-card > p {
+  font-size: 12px;
+  line-height: 1.9;
+  color: #8c9e7d;
+}
+.onboarding-card .primary {
+  font-size: 12px;
+  margin-top: 12px;
+}
+.onboarding-card .text-button {
+  font-size: 11px;
+  margin-top: 25px;
+}
+.live-workspace .main {
+  padding-top: 32px;
+}
+.live-workspace .search {
+  margin-left: 0;
+  flex: 1;
+}
+.live-workspace .search input {
+  width: 100%;
+  min-width: 90px;
+}
+.live-workspace .table-tools > select,
+.directory-tools > select {
+  border: 1px solid #dce5d3;
+  border-radius: 5px;
+  font-size: 11px;
+  padding: 8px;
+  color: #788e6b;
+  background: white;
+}
+.account-readiness {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  background: #f0f5e9;
+  border: 1px solid #dce7cf;
+  border-radius: 8px;
+  color: #87a174;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+.account-readiness > div {
+  flex: 1;
+  min-width: 180px;
+}
+.account-readiness strong {
+  font-size: 13px;
+  color: #60834e;
+}
+.account-readiness p {
+  font-size: 11px;
+  color: #8fa17e;
+  line-height: 1.8;
+  margin: 7px 0 0;
+}
+.account-readiness > .badge {
+  margin-left: auto;
+}
+.live-workspace .resource-panel > p {
+  font-size: 12px;
+  color: #8e9f80;
+  line-height: 1.8;
+}
+.live-workspace .care-card > strong {
+  display: block;
+  margin-top: 10px;
+}
+.live-workspace .resource-panel form input,
+.live-workspace .resource-panel form select,
+.live-workspace .resource-panel form textarea {
+  font-size: 13px;
+}
+.member-review {
+  border: 1px solid #e0e8d8;
+  border-radius: 8px;
+  padding: 22px;
+  margin-top: 18px;
+}
+.member-review > .resource-heading {
+  margin-bottom: 12px;
+}
+.member-review strong {
+  font-size: 14px;
+}
+.member-review p {
+  font-size: 12px;
+  line-height: 1.8;
+  color: #8b9d7b;
+}
+.member-review .license-review {
+  background: #f6f8f1;
+  padding: 13px;
+  border-radius: 5px;
+  color: #7a8b69;
+  font-size: 11px;
+}
+.admin-actions {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+.loading-panel {
+  text-align: center;
+  color: #8ca477;
+}
+.loading-panel > svg {
+  margin: 20px auto;
+}
+.loading-panel h2 {
+  font-size: 20px;
+}
+.badge.draft {
+  color: #9b91ac;
+  background: #f0edf5;
+}
+.workspace-dialog .form-error,
+.workspace-dialog .success-message {
+  display: block;
+}
+.live-workspace .detail-actions .danger-link {
+  padding: 12px;
+  color: #b17e70;
+  font-size: 11px;
+}
+.onboarding-card .form-grid {
+  gap: 0 16px;
+}
+@media (max-width: 1100px) {
+  .account-story {
+    padding: 35px;
+  }
+  .account-main {
+    padding: 30px;
+  }
+  .account-card h2 {
+    font-size: 31px;
+  }
+}
+@media (max-width: 760px) {
+  .account-page {
+    display: block;
+  }
+  .account-story {
+    min-height: auto;
+    padding: 25px 24px;
+  }
+  .story-content {
+    padding: 32px 0 5px;
+  }
+  .story-content h1 {
+    font-size: 37px;
+  }
+  .story-content h1 br:last-child {
+    display: none;
+  }
+  .story-content > p {
+    font-size: 12px;
+    margin-bottom: 10px;
+    max-width: 100%;
+  }
+  .story-feature {
+    display: none;
+  }
+  .account-story > small {
+    display: none;
+  }
+  .account-main {
+    min-height: auto;
+    padding: 25px 24px 20px;
+  }
+  .account-top {
+    font-size: 10px;
+  }
+  .account-card {
+    padding: 35px 0;
+    max-width: none;
+  }
+  .account-card h2 {
+    font-size: 31px;
+  }
+  .account-card > p {
+    font-size: 12px;
+  }
+  .account-bottom {
+    font-size: 8px;
+  }
+  .account-type button {
+    font-size: 10px;
+    padding: 10px 6px;
+  }
+  .onboarding-card {
+    padding: 27px 22px;
+    margin: 25px 0;
+  }
+  .onboarding-card h1 {
+    font-size: 30px;
+  }
+  .live-workspace .main {
+    padding-top: 24px;
+  }
+  .account-readiness {
+    padding: 17px;
+    gap: 11px;
+  }
+  .account-readiness > svg {
+    display: none;
+  }
+  .live-workspace .table-tools {
+    padding-inline: 16px;
+  }
+  .live-workspace .table-tools > .search {
+    flex-basis: 100%;
+  }
+  .live-workspace .table-tools > select {
+    font-size: 10px;
+  }
+  .member-review {
+    padding: 17px;
+  }
+  .workspace-dialog .form-grid {
+    grid-template-columns: 1fr;
+  }
 }

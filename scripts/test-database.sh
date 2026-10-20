@@ -10,6 +10,6 @@ for attempt in {1..30}; do
   sleep 1
 done
 docker exec "$container" pg_isready -U postgres >/dev/null
-for file in tests/db-bootstrap.sql supabase/migrations/202610200001_foundation.sql tests/database.sql; do
+for file in tests/db-bootstrap.sql supabase/migrations/202610200001_foundation.sql tests/database.sql supabase/migrations/202610200002_real_workflows.sql tests/production-database.sql; do
  docker exec -i "$container" psql -q -U postgres -d staftify_test -v ON_ERROR_STOP=1 < "$file"
 done
