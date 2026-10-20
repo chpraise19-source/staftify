@@ -4,7 +4,8 @@ A Next.js, TypeScript, Tailwind CSS and Supabase healthcare staffing application
 
 ## Real application routes
 
-- `/` opens the authenticated workspace or redirects to sign-in.
+- `/` opens the responsive STAFTIFY welcome screen, with role-specific nurse/facility registration and sign-in paths. Returning users sign in and enter `/dashboard`, which resolves their trusted database role.
+- `/admin/login` is a separate administrator entry. The server checks the existing administrator role and suspension status; public registration never grants administrator access.
 - `/register`: facility or nurse email/password registration with email confirmation.
 - `/login`: real Supabase authentication; no sample accounts or role switching.
 - `/onboarding`: confirmed account setup. Facility registration creates a facility owned by that user. Nurse registration creates a professional account. Administrator access is never public.
@@ -31,3 +32,5 @@ The application has explicit, opt-in screen-review routes at `/development/facil
 Supabase is required for real registration/sign-in, persistent shifts, applications/bookings, notifications, license/facility verification, OTP attendance and timesheet approvals. Stripe is required for actual facility billing. The “Live access requirements” dialog explains those boundaries on every preview portal.
 
 Current screen captures from the running Next.js app are in [docs/screens](docs/screens). The preview routes require a running Next.js process, not static file hosting. Public port forwarding remains unavailable in this environment; no public website URL is claimed.
+
+The welcome screen uses an original generated healthcare photograph, bundled locally for fast loading without third-party image requests. Reduced-motion settings are respected. Development review links appear only when `STAFTIFY_ENABLE_PREVIEW=true`; they never bypass authentication for production data.

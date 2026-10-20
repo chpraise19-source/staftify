@@ -4,12 +4,13 @@ import { configured } from "@/lib/supabase";
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; type?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, type } = await searchParams;
   return (
     <AccountForm
       mode="login"
+      initialType={type === "nurse" ? "nurse" : "facility"}
       configured={configured()}
       previewEnabled={developmentPreviewEnabled()}
       initialError={

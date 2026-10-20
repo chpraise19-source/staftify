@@ -8,12 +8,14 @@ export default function AccountForm({
   initialType = "facility",
   initialError,
   previewEnabled = false,
+  adminOnly = false,
 }: {
   mode: "login" | "register";
   configured: boolean;
   initialType?: "facility" | "nurse";
   initialError?: string;
   previewEnabled?: boolean;
+  adminOnly?: boolean;
 }) {
   const [accountType, setAccountType] = useState(initialType);
   const [busy, setBusy] = useState(false);
@@ -65,17 +67,21 @@ export default function AccountForm({
       </section>
       <section className="account-main">
         <div className="account-top">
-          {mode === "login" ? (
+          {adminOnly ? (
+            <Link href="/">
+              Back to STAFTIFY <ArrowRight size={14} />
+            </Link>
+          ) : mode === "login" ? (
             <>
               New to STAFTIFY?{" "}
-              <Link href="/register">
+              <Link href={"/register?type=" + accountType}>
                 Create an account <ArrowRight size={14} />
               </Link>
             </>
           ) : (
             <>
               Already a member?{" "}
-              <Link href="/login">
+              <Link href={"/login?type=" + accountType}>
                 Sign in <ArrowRight size={14} />
               </Link>
             </>
@@ -84,14 +90,18 @@ export default function AccountForm({
         <div className="account-card">
           <span className="eyebrow">YOUR NEXT CONNECTION STARTS HERE</span>
           <h2>
-            {mode === "login"
-              ? "Welcome back."
-              : "Better care starts with you."}
+            {adminOnly
+              ? "Administrator sign-in"
+              : mode === "login"
+                ? "Welcome back."
+                : "Better care starts with you."}
           </h2>
           <p>
-            {mode === "login"
-              ? "Sign in to your STAFTIFY workspace."
-              : "Create your account and complete your professional workspace."}
+            {adminOnly
+              ? "Restricted to authorized STAFTIFY administrators. Your role is checked on the server."
+              : mode === "login"
+                ? "Sign in to your STAFTIFY workspace."
+                : "Create your account and complete your professional workspace."}
           </p>
           {!configured && (
             <div className="connection-notice" role="status">
@@ -123,8 +133,11 @@ export default function AccountForm({
               ))}
             </div>
           )}
-          {previewEnabled && (
-            <Link className="screen-review-link" href="/development/facility">
+          {previewEnabled && !adminOnly && (
+            <Link
+              className="screen-review-link"
+              href={"/development/" + accountType}
+            >
               <span>
                 <strong>Review the application screens</strong>
                 <small>
@@ -150,20 +163,23 @@ export default function AccountForm({
               }
               setBusy(true);
               try {
-                const r = await fetch("/api/auth/" + mode, {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    email: f.get("email"),
-                    password,
-                    ...(mode === "register"
-                      ? {
-                          full_name: f.get("full_name"),
-                          account_type: accountType,
-                        }
-                      : {}),
-                  }),
-                });
+                const r = await fetch(
+                  "/api/auth/" + (adminOnly ? "admin" : mode),
+                  {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      email: f.get("email"),
+                      password,
+                      ...(mode === "register"
+                        ? {
+                            full_name: f.get("full_name"),
+                            account_type: accountType,
+                          }
+                        : {}),
+                    }),
+                  },
+                );
                 const data = await r.json();
                 if (!r.ok) throw new Error(data.error);
                 if (data.next) window.location.assign(data.next);

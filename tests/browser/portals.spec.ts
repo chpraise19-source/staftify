@@ -1,18 +1,14 @@
 import { test, expect } from "@playwright/test";
-test("root opens real sign-in without a demo or fabricated account", async ({
-  page,
-}) => {
+test("root opens the real STAFTIFY welcome screen", async ({ page }) => {
   await page.goto("/");
-  await expect(page).toHaveURL(/\/login/);
+  await expect(page).toHaveURL(/\/$/);
   await expect(
-    page.getByRole("heading", { name: "Welcome back." }),
+    page.getByRole("heading", { name: /Healthcare staffing.\s*On demand./ }),
   ).toBeVisible();
-  await expect(page.getByLabel("Email address")).toBeVisible();
-  await expect(page.getByLabel("Password", { exact: true })).toBeVisible();
-  await expect(page.getByText("INTERACTIVE DEMO")).toHaveCount(0);
   await expect(
-    page.getByRole("button", { name: "Facility", exact: true }),
-  ).toHaveCount(0);
+    page.getByRole("link", { name: "Sign In", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("INTERACTIVE DEMO")).toHaveCount(0);
 });
 test("facility and nurse registration are real account forms", async ({
   page,
