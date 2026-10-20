@@ -15,6 +15,7 @@ jobs:
       - run: npm test
       - run: npm run typecheck
       - run: npm run build
+      - run: node scripts/build-preview.mjs
       - run: bash scripts/test-database.sh
       - run: npx playwright install --with-deps chromium
       - run: npm start > /tmp/staftify.log 2>&1 &

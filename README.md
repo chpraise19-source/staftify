@@ -14,8 +14,12 @@ Healthcare staffing platform built with Next.js App Router, TypeScript, Tailwind
 
 ## Development
 
-Node.js 24 and npm. `npm ci`, `npm run dev`; production uses `npm run build` and `npm start`. Copy `.env.example` into an ignored local environment file only when configuring real services. With no credentials, demo pages work and live actions fail closed. Demo state is local to the mounted browser session and is intentionally not persisted.
+Node.js 24 and npm. `npm ci`, `npm run dev`; production uses `npm run build` and `npm start`. Copy `.env.example` into an ignored local environment file only when configuring real services. With no credentials, demo pages work and live actions fail closed. Demo changes persist in browser localStorage and are shared across the three portals and tabs. Settings → Reset demo workspace restores the sample data. No external accounts are needed for the demo.
 
-`npm test` runs domain validation/pay calculations. `npm run typecheck` checks TypeScript. Browser tests run with `npx playwright test` against a running server; set `CHROMIUM_PATH` to use an existing Chromium binary, or install the Playwright-managed browser. See [verification](docs/VERIFICATION.md) for database tests and actual results.
+`npm test` runs domain validation, pay calculations, and demo workflow tests. `npm run typecheck` checks TypeScript. Browser tests run with `npx playwright test` against a running server; set `CHROMIUM_PATH` to use an existing Chromium binary, or install the Playwright-managed browser. See [verification](docs/VERIFICATION.md) for database tests and actual results.
 
 See [architecture](docs/ARCHITECTURE.md) and [deployment](docs/DEPLOYMENT.md) for security boundaries, infrastructure, and remaining activation steps. No source from another project was used or changed.
+
+## Interactive preview
+
+The connected demo is the default experience. It includes realistic sample nurses, facilities, applications, weekly schedules, attendance codes, approvable timesheets, directories, notifications, reports, and preferences. See [demo guide](docs/DEMO.md). `npm run preview:export` creates a self-contained HTML preview at `preview/dist/staftify-demo.html`; it contains its own scripts, styles, and icons and makes no network requests. A public hosting URL is intentionally deferred.

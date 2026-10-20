@@ -1,2 +1,2 @@
-import Dashboard from '@/components/dashboard';
-export default function Page(){return <Dashboard role="facility" demo />}
+import DemoWorkspace from '@/components/demo/workspace';
+export default function Page(){return <DemoWorkspace role="facility"/>}
