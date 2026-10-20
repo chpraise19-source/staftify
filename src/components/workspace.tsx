@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Activity,
   ArrowDownToLine,
@@ -25,10 +25,12 @@ import {
   X,
   Zap,
 } from "lucide-react";
+import Link from "next/link";
 import { currency, hoursBetween } from "@/lib/domain";
 import type { Profile, Shift, WorkspaceData } from "@/lib/types";
 import Dialog from "./dialog";
 import ShiftEditor from "./shift-editor";
+import WorkspaceOverview from "./workspace-overview";
 import {
   ProfessionalProfile,
   AdminPanel,
@@ -63,11 +65,13 @@ const icons: Record<string, typeof LayoutDashboard> = {
 };
 export default function Workspace({
   profile: initialProfile,
+  previewData,
 }: {
   profile: Profile;
+  previewData?: WorkspaceData;
 }) {
-  const [data, setData] = useState<WorkspaceData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<WorkspaceData | null>(previewData ?? null);
+  const [loading, setLoading] = useState(!previewData);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [busy, setBusy] = useState(false);
@@ -82,31 +86,46 @@ export default function Workspace({
   const [cancelId, setCancelId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [week, setWeek] = useState(0);
+  const [requirementsOpen, setRequirementsOpen] = useState(false);
+  const sidebarRef = useRef<HTMLElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
   const [updated, setUpdated] = useState<Date | null>(null);
-  const load = useCallback(async (signal?: AbortSignal) => {
-    try {
-      const r = await fetch("/api/workspace", { cache: "no-store", signal });
-      const d = await r.json();
-      if (!r.ok) {
-        if (r.status === 401) {
-          window.location.assign("/login");
-          return;
-        }
-        throw new Error(d.error);
+  const load = useCallback(
+    async (signal?: AbortSignal) => {
+      if (previewData) {
+        setData(previewData);
+        setLoading(false);
+        setSuccess(
+          "Development preview refreshed. Sample records are unchanged; live refresh needs Supabase.",
+        );
+        return;
       }
-      setData(d);
-      setUpdated(new Date());
-      setError("");
-    } catch (e) {
-      if (signal?.aborted) return;
-      setError(
-        e instanceof Error ? e.message : "Workspace could not be loaded.",
-      );
-    } finally {
-      if (!signal?.aborted) setLoading(false);
-    }
-  }, []);
+      try {
+        const r = await fetch("/api/workspace", { cache: "no-store", signal });
+        const d = await r.json();
+        if (!r.ok) {
+          if (r.status === 401) {
+            window.location.assign("/login");
+            return;
+          }
+          throw new Error(d.error);
+        }
+        setData(d);
+        setUpdated(new Date());
+        setError("");
+      } catch (e) {
+        if (signal?.aborted) return;
+        setError(
+          e instanceof Error ? e.message : "Workspace could not be loaded.",
+        );
+      } finally {
+        if (!signal?.aborted) setLoading(false);
+      }
+    },
+    [previewData],
+  );
   useEffect(() => {
+    if (previewData) return;
     const c = new AbortController();
     void load(c.signal);
     const timer = setInterval(() => {
@@ -116,13 +135,20 @@ export default function Workspace({
       c.abort();
       clearInterval(timer);
     };
-  }, [load]);
+  }, [load, previewData]);
   const request = async (
     url: string,
     method: string,
     body: unknown,
     message: string,
   ) => {
+    if (previewData) {
+      setSuccess("");
+      setError(
+        "Development preview: this action requires live database access. No records, approvals, bookings, messages, or payments were changed.",
+      );
+      return null;
+    }
     setBusy(true);
     setError("");
     setSuccess("");
@@ -151,6 +177,11 @@ export default function Workspace({
     request("/api/actions", "POST", { action, ...payload }, "Changes saved.");
   const navigate = (next: string) => {
     setTab(next);
+    const url = new URL(window.location.href);
+    url.hash = encodeURIComponent(next);
+    if (url.href !== window.location.href)
+      window.history.pushState(null, "", url);
+    window.scrollTo({ top: 0, behavior: "smooth" });
     setMobile(false);
     setSearch("");
     setFilter("all");
@@ -200,6 +231,60 @@ export default function Workspace({
             "Timesheets",
             "Reports",
           ];
+  useEffect(() => {
+    const restore = () => {
+      let view = "Overview";
+      try {
+        view = decodeURIComponent(window.location.hash.slice(1)) || "Overview";
+      } catch {}
+      setTab([...nav, "Notifications"].includes(view) ? view : "Overview");
+      setSearch("");
+      setFilter("all");
+      setPage(1);
+    };
+    restore();
+    window.addEventListener("popstate", restore);
+    window.addEventListener("hashchange", restore);
+    return () => {
+      window.removeEventListener("popstate", restore);
+      window.removeEventListener("hashchange", restore);
+    };
+    // Navigation permissions are based on the authenticated profile, never the URL.
+  }, [role]);
+  useEffect(() => {
+    if (!loading) headingRef.current?.focus({ preventScroll: true });
+  }, [tab, loading]);
+  useEffect(() => {
+    if (!mobile) return;
+    const previous = document.activeElement as HTMLElement | null;
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    sidebarRef.current?.querySelector<HTMLButtonElement>("nav button")?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobile(false);
+      if (e.key === "Tab") {
+        const buttons = sidebarRef.current?.querySelectorAll<HTMLElement>(
+          "button:not(:disabled),a[href]",
+        );
+        if (!buttons?.length) return;
+        const first = buttons[0],
+          last = buttons[buttons.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = overflow;
+      document.removeEventListener("keydown", onKey);
+      previous?.focus();
+    };
+  }, [mobile]);
   const person = (id: string) =>
     profiles.find((p) => p.id === id)?.full_name ?? "Nursing professional";
   const location = (id: string) =>
@@ -218,6 +303,7 @@ export default function Workspace({
   const exportReport = () => {
     const rows = [
       [
+        "Data source",
         "Shift",
         "Facility",
         "Credential",
@@ -227,6 +313,7 @@ export default function Workspace({
         "USD per hour",
       ],
       ...shifts.map((s) => [
+        previewData ? "DEVELOPMENT SAMPLE" : "Supabase workspace",
         s.title,
         location(s.facility_id),
         s.specialty,
@@ -245,7 +332,9 @@ export default function Workspace({
     );
     const a = document.createElement("a");
     a.href = url;
-    a.download = "staftify-shifts.csv";
+    a.download = previewData
+      ? "staftify-development-sample-shifts.csv"
+      : "staftify-shifts.csv";
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
@@ -288,7 +377,11 @@ export default function Workspace({
           onClick={() => setMobile(false)}
         />
       )}
-      <aside className={"sidebar " + (mobile ? "visible" : "")}>
+      <aside
+        ref={sidebarRef}
+        id="workspace-navigation"
+        className={"sidebar " + (mobile ? "visible" : "")}
+      >
         <button className="brand" onClick={() => navigate("Overview")}>
           staftify<span>✦</span>
         </button>
@@ -359,8 +452,14 @@ export default function Workspace({
               <span>{role} account</span>
             </div>
             <button
-              aria-label="Sign out"
+              aria-label={
+                previewData ? "Leave development preview" : "Sign out"
+              }
               onClick={async () => {
+                if (previewData) {
+                  window.location.assign("/login");
+                  return;
+                }
                 const result = await request(
                   "/api/logout",
                   "POST",
@@ -375,12 +474,14 @@ export default function Workspace({
           </div>
         </div>
       </aside>
-      <div className="main-wrap">
+      <div className="main-wrap" inert={mobile || undefined}>
         <header className="topbar">
           <div className="breadcrumb">
             <button
               className="mobile-toggle"
               aria-label="Toggle navigation"
+              aria-expanded={mobile}
+              aria-controls="workspace-navigation"
               onClick={() => setMobile(!mobile)}
             >
               <Menu size={21} />
@@ -390,14 +491,17 @@ export default function Workspace({
             <strong>{tab}</strong>
           </div>
           <div className="top-actions">
+            {previewData && <span className="preview-indicator">PREVIEW</span>}
             <span className="today">
-              {updated
-                ? "Updated " +
-                  updated.toLocaleTimeString("en-US", {
-                    hour: "numeric",
-                    minute: "2-digit",
-                  })
-                : "Connecting securely"}
+              {previewData
+                ? "Screen review · sample data"
+                : updated
+                  ? "Updated " +
+                    updated.toLocaleTimeString("en-US", {
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })
+                  : "Connecting securely"}
             </span>
             <button
               aria-label="Refresh workspace"
@@ -419,18 +523,56 @@ export default function Workspace({
           </div>
         </header>
         <main className="main">
+          {previewData && (
+            <section
+              className="development-bar"
+              aria-label="Development preview"
+            >
+              <div className="development-label">
+                <span />
+                DEVELOPMENT PREVIEW
+              </div>
+              <p>
+                Fictional records · screen review only · changes are not saved
+              </p>
+              <div className="portal-switcher" aria-label="Review portal">
+                {(["facility", "nurse", "admin"] as const).map((r) => (
+                  <Link
+                    key={r}
+                    href={"/development/" + r}
+                    aria-current={role === r ? "page" : undefined}
+                    className={role === r ? "selected" : ""}
+                  >
+                    {r[0].toUpperCase() + r.slice(1)}
+                  </Link>
+                ))}
+              </div>
+              <button
+                className="development-info"
+                onClick={() => setRequirementsOpen(true)}
+              >
+                Live access requirements
+                <ShieldCheck size={14} />
+              </button>
+            </section>
+          )}
+
           <div className="page-heading">
             <div>
               <span className="eyebrow">YOUR STAFFING, SIMPLIFIED</span>
-              <h1>
+              <h1 ref={headingRef} tabIndex={-1}>
                 {tab === "Overview"
                   ? "Welcome, " + profile.full_name.split(" ")[0]
                   : tab}
               </h1>
               <p>
                 {tab === "Overview"
-                  ? "Your live staffing workspace. Every shift and application is stored securely."
-                  : "Your workspace data is protected by account and facility permissions."}
+                  ? previewData
+                    ? "Review the actual workspace design using clearly labeled sample records."
+                    : "Your live staffing workspace. Every shift and application is stored securely."
+                  : previewData
+                    ? "Screen review only. Changes and approvals require live database access."
+                    : "Your workspace data is protected by account and facility permissions."}
               </p>
             </div>
             <div className="heading-actions">
@@ -489,17 +631,21 @@ export default function Workspace({
                   <div>
                     <strong>
                       {facility.verification_status === "verified"
-                        ? "Facility verified"
+                        ? previewData
+                          ? "Sample facility · verified state"
+                          : "Facility verified"
                         : "Facility review " + facility.verification_status}
                     </strong>
                     <p>
-                      {facility.verification_status !== "verified"
-                        ? "You can prepare draft shifts now. An administrator must verify the facility before publication."
-                        : !["active", "trialing"].includes(
-                              facility.subscription_status,
-                            )
-                          ? "Prepare draft shifts while your facility subscription is activated."
-                          : "Your facility is ready to publish staffing opportunities."}
+                      {previewData
+                        ? "This illustrates a verified facility with an active plan. Real publishing requires live database and billing access."
+                        : facility.verification_status !== "verified"
+                          ? "You can prepare draft shifts now. An administrator must verify the facility before publication."
+                          : !["active", "trialing"].includes(
+                                facility.subscription_status,
+                              )
+                            ? "Prepare draft shifts while your facility subscription is activated."
+                            : "Your facility is ready to publish staffing opportunities."}
                     </p>
                   </div>
                   <span className="badge">
@@ -584,7 +730,11 @@ export default function Workspace({
                         </div>
                         <div>
                           <strong>People-first staffing</strong>
-                          <span>Securely connected</span>
+                          <span>
+                            {previewData
+                              ? "Development screen review"
+                              : "Securely connected"}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -628,11 +778,26 @@ export default function Workspace({
                           </div>
                         </div>
                         <strong>{x.value}</strong>
-                        <small>From your accessible workspace records</small>
+                        <small>
+                          {previewData
+                            ? "Illustrative sample records"
+                            : "From your accessible workspace records"}
+                        </small>
                       </article>
                     ))}
                   </section>
                 </>
+              )}
+              {tab === "Overview" && (
+                <WorkspaceOverview
+                  data={data}
+                  onNavigate={navigate}
+                  onShift={(id) => {
+                    setSelected(id);
+                    setError("");
+                    setSuccess("");
+                  }}
+                />
               )}
               {["Overview", "Shifts", "Find shifts"].includes(tab) && (
                 <section className="panel shift-panel">
@@ -792,10 +957,26 @@ export default function Workspace({
                         </h3>
                         <p>
                           {role === "facility"
-                            ? "Create your first shift to start staffing your team."
+                            ? shifts.length
+                              ? "Try another search or clear your filters."
+                              : "Create your first shift to start staffing your team."
                             : "Available shifts will appear here when facilities publish them."}
                         </p>
-                        {role === "facility" && (
+                        {shifts.length > 0 && (
+                          <button
+                            className="secondary"
+                            onClick={() => {
+                              setSearch("");
+                              setFilter("all");
+                              setCredential("all");
+                              setUrgent(false);
+                              setPage(1);
+                            }}
+                          >
+                            Clear filters
+                          </button>
+                        )}
+                        {role === "facility" && !shifts.length && (
                           <button
                             className="primary"
                             onClick={() => setEditor("new")}
@@ -1258,11 +1439,53 @@ export default function Workspace({
             </>
           )}
           <footer className="footer">
-            <span>© {new Date().getFullYear()} STAFTIFY</span>
+            <span>
+              © {new Date().getFullYear()} STAFTIFY{" "}
+              {previewData ? "· Development preview" : ""}
+            </span>
             <span>Connecting people. Elevating care.</span>
           </footer>
         </main>
       </div>
+      {requirementsOpen && (
+        <Dialog
+          title="What needs live access?"
+          onClose={() => setRequirementsOpen(false)}
+        >
+          <p>
+            You are reviewing the actual Next.js workspace components with
+            fictional records. Navigation, filters, schedule browsing, form
+            validation, dialogs, and sample CSV exports work here.
+          </p>
+          <ul className="access-requirements">
+            <li>
+              <strong>Supabase Auth:</strong> registration, email confirmation,
+              sign-in, and real account permissions.
+            </li>
+            <li>
+              <strong>Supabase database:</strong> saving/editing/publishing
+              shifts, applications, bookings, priority lists, notifications,
+              verification, OTP attendance, and timesheet approval.
+            </li>
+            <li>
+              <strong>Stripe:</strong> facility subscription checkout and
+              billing management. Facilities pay nurses directly.
+            </li>
+            <li>
+              <strong>Hosting:</strong> a publicly accessible website address.
+              This development route runs inside the actual Next.js app.
+            </li>
+          </ul>
+          <p className="notice">
+            Preview mode never signs in as a sample account and never grants
+            access to the authenticated dashboard or API endpoints.
+          </p>
+          <Link className="primary" href="/login">
+            Open real sign-in
+            <ArrowRight size={15} />
+          </Link>
+        </Dialog>
+      )}
       {editor && (
         <Dialog
           title={editor === "new" ? "Create a shift" : "Edit shift"}

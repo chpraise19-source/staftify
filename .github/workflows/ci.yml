@@ -17,7 +17,7 @@ jobs:
       - run: npm run build
       - run: bash scripts/test-database.sh
       - run: npx playwright install --with-deps chromium
-      - run: npm start > /tmp/staftify.log 2>&1 &
+      - run: STAFTIFY_ENABLE_PREVIEW=true npm start > /tmp/staftify.log 2>&1 &
       - run: |
           for attempt in {1..30}; do
             if curl --fail --silent http://127.0.0.1:3000 > /dev/null; then exit 0; fi

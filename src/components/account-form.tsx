@@ -7,11 +7,13 @@ export default function AccountForm({
   configured,
   initialType = "facility",
   initialError,
+  previewEnabled = false,
 }: {
   mode: "login" | "register";
   configured: boolean;
   initialType?: "facility" | "nurse";
   initialError?: string;
+  previewEnabled?: boolean;
 }) {
   const [accountType, setAccountType] = useState(initialType);
   const [busy, setBusy] = useState(false);
@@ -120,6 +122,17 @@ export default function AccountForm({
                 </button>
               ))}
             </div>
+          )}
+          {previewEnabled && (
+            <Link className="screen-review-link" href="/development/facility">
+              <span>
+                <strong>Review the application screens</strong>
+                <small>
+                  Development preview · sample records · no sign-in needed
+                </small>
+              </span>
+              <ArrowRight size={18} />
+            </Link>
           )}
           <form
             onSubmit={async (e) => {

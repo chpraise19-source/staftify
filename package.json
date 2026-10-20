@@ -8,7 +8,9 @@
     "start": "next start --hostname 0.0.0.0",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
-    "test:browser": "playwright test"
+    "test:browser": "playwright test",
+    "dev:review": "STAFTIFY_ENABLE_PREVIEW=true next dev --hostname 0.0.0.0",
+    "start:review": "STAFTIFY_ENABLE_PREVIEW=true next start --hostname 0.0.0.0"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
