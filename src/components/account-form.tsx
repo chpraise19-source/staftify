@@ -139,9 +139,10 @@ export default function AccountForm({
               href={"/development/" + accountType}
             >
               <span>
-                <strong>Review the application screens</strong>
+                <strong>Open the local test workspace</strong>
                 <small>
-                  Development preview · sample records · no sign-in needed
+                  Simulated operations · saved in this browser · no sign-in
+                  needed
                 </small>
               </span>
               <ArrowRight size={18} />

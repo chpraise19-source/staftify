@@ -12,7 +12,11 @@ for (const role of ["nurse", "facility"] as const) {
             : "I'm a Facility — Find Nurses",
       })
       .click();
-    await expect(page).toHaveURL(new RegExp(`/register\\?type=${role}`));
+    await expect(page).toHaveURL(new RegExp(`/development/${role}#`));
+    await expect(
+      page.getByRole("region", { name: "Development preview" }),
+    ).toContainText("Simulated operations");
+    await page.goto(`/register?type=${role}`);
     await expect(
       page.getByRole("button", {
         name: role === "nurse" ? "Nursing professional" : "Healthcare facility",

@@ -22,10 +22,16 @@ export default function Page() {
           <BrandMark />
         </Link>
         <nav className="welcome-nav" aria-label="Account navigation">
-          <Link className="welcome-signin" href="/login">
+          <Link
+            className="welcome-signin"
+            href={review ? "/development" : "/login"}
+          >
             Sign In
           </Link>
-          <Link className="welcome-create" href="/register">
+          <Link
+            className="welcome-create"
+            href={review ? "/development" : "/register"}
+          >
             Create Account
             <ArrowUpRight size={14} />
           </Link>
@@ -49,7 +55,11 @@ export default function Page() {
           <div className="welcome-paths">
             <Link
               className="welcome-path nurse-path"
-              href="/register?type=nurse"
+              href={
+                review
+                  ? "/development/nurse#Find%20shifts"
+                  : "/register?type=nurse"
+              }
             >
               <span className="path-symbol">
                 <HeartPulse size={23} strokeWidth={1.6} />
@@ -62,7 +72,11 @@ export default function Page() {
             </Link>
             <Link
               className="welcome-path facility-path"
-              href="/register?type=facility"
+              href={
+                review
+                  ? "/development/facility#Nurse%20network"
+                  : "/register?type=facility"
+              }
             >
               <span className="path-symbol">
                 <ShieldCheck size={23} strokeWidth={1.6} />
@@ -86,18 +100,24 @@ export default function Page() {
           </div>
           {review && (
             <div className="welcome-review">
-              <span className="welcome-review-label">DEVELOPMENT REVIEW</span>
+              <span className="welcome-review-label">
+                DEVELOPMENT WORKSPACE
+              </span>
               <p>
-                Take a look around the application while live account access is
-                being connected.
+                Buttons open local test accounts. Shifts, requests and approvals
+                are simulated and saved in this browser.
               </p>
               <div>
                 <Link href="/development/nurse">
-                  Nurse screens
+                  Nurse portal
                   <ArrowUpRight size={12} />
                 </Link>
                 <Link href="/development/facility">
-                  Facility screens
+                  Facility portal
+                  <ArrowUpRight size={12} />
+                </Link>
+                <Link href="/development">
+                  All test accounts
                   <ArrowUpRight size={12} />
                 </Link>
               </div>

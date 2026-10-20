@@ -11,7 +11,7 @@ test("facility preview displays real components, supports navigation and restore
   await page.goto("/development/facility");
   await expect(
     page.getByRole("region", { name: "Development preview" }),
-  ).toContainText("Fictional records");
+  ).toContainText("Simulated operations");
   await expect(
     page.getByRole("heading", { name: "Welcome, Alex" }),
   ).toBeVisible();
@@ -35,7 +35,7 @@ test("facility preview displays real components, supports navigation and restore
     page.getByRole("heading", { name: "Review applications" }),
   ).toBeVisible();
 });
-test("preview opens real shift form, validates input and prevents all API writes", async ({
+test("local preview validates and saves draft shifts and bookings without live API writes", async ({
   page,
 }) => {
   const apiRequests: string[] = [];
@@ -56,20 +56,23 @@ test("preview opens real shift form, validates input and prevents all API writes
   );
   await page.getByLabel("End date & time").fill("2030-01-02T07:00");
   await page.getByRole("button", { name: "Save draft shift" }).click();
-  await expect(page.getByRole("dialog").getByRole("alert")).toContainText(
-    "requires live database access",
-  );
-  await page.getByRole("button", { name: "Close dialog" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByRole("status")).toContainText("Simulated");
+  await nav(page, "Shifts");
+  await expect(
+    page.getByRole("button", { name: "Development shift review", exact: true }),
+  ).toBeVisible();
+  await page.reload();
+  await expect(
+    page.getByRole("button", { name: "Development shift review", exact: true }),
+  ).toBeVisible();
   await nav(page, "Applications");
   await page.getByRole("button", { name: "Approve & book" }).first().click();
   await expect(
-    page.getByRole("alert").filter({ hasText: "Development preview:" }),
-  ).toContainText("No records, approvals, bookings");
-  await expect(
     page
       .locator(".application-card .badge")
-      .getByText("pending", { exact: true }),
-  ).toHaveCount(3);
+      .getByText("accepted", { exact: true }),
+  ).toHaveCount(1);
   await page.getByRole("button", { name: "Refresh workspace" }).click();
   expect(apiRequests).toEqual([]);
 });
@@ -97,7 +100,7 @@ test("shift search, filters, details and CSV export are useful in preview", asyn
     "staftify-development-sample-shifts.csv",
   );
 });
-test("nurse portal shows profile, applications, schedule and gated attendance", async ({
+test("nurse portal saves profiles and withdrawals and rejects invalid attendance codes", async ({
   page,
 }) => {
   await page.goto("/development/nurse");
@@ -109,26 +112,24 @@ test("nurse portal shows profile, applications, schedule and gated attendance", 
     page.getByRole("heading", { name: "Your professional profile" }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Save professional profile" }).click();
-  await expect(
-    page.getByRole("alert").filter({ hasText: "Development preview:" }),
-  ).toContainText("requires live database access");
+  await expect(page.getByRole("status")).toContainText("Simulated");
   await nav(page, "My applications");
   await expect(
     page.getByRole("heading", { name: "Your applications" }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Withdraw", exact: true }).click();
-  await expect(
-    page.getByRole("alert").filter({ hasText: "Development preview:" }),
-  ).toContainText("requires live database access");
+  await expect(page.locator(".application-card .badge")).toHaveText(
+    "withdrawn",
+  );
   await nav(page, "Timesheets");
   await expect(
     page.getByRole("heading", { name: "Clock in & out" }),
   ).toBeVisible();
   await page.getByLabel("Verification code").fill("123456");
   await page.getByRole("button", { name: "Clock in", exact: true }).click();
-  await expect(
-    page.getByRole("alert").filter({ hasText: "Development preview:" }),
-  ).toContainText("requires live database access");
+  await expect(page.locator(".form-error[role=alert]")).toContainText(
+    "Invalid or expired simulated code",
+  );
 });
 test("admin portal renders verification directories without granting admin access", async ({
   page,
@@ -143,9 +144,7 @@ test("admin portal renders verification directories without granting admin acces
     .locator(".facility-card")
     .filter({ hasText: "Riverside Care Hospital" });
   await card.getByRole("button", { name: "Verify facility" }).click();
-  await expect(
-    page.getByRole("alert").filter({ hasText: "Development preview:" }),
-  ).toContainText("requires live database access");
+  await expect(card.locator(".badge").first()).toContainText("verified");
   await nav(page, "Members");
   await expect(
     page.getByRole("heading", { name: "Members & professional verification" }),

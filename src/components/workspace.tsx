@@ -29,6 +29,15 @@ import Link from "next/link";
 import { currency, hoursBetween } from "@/lib/domain";
 import type { Profile, Shift, WorkspaceData } from "@/lib/types";
 import Dialog from "./dialog";
+import {
+  readLocalWorkspace,
+  localRequest,
+  resetLocalWorkspace,
+  readLocalHistory,
+  LOCAL_CHANGE,
+  LOCAL_CHANNEL,
+} from "@/lib/development/storage";
+import type { LocalState } from "@/lib/development/simulation";
 import ShiftEditor from "./shift-editor";
 import WorkspaceOverview from "./workspace-overview";
 import {
@@ -70,8 +79,8 @@ export default function Workspace({
   profile: Profile;
   previewData?: WorkspaceData;
 }) {
-  const [data, setData] = useState<WorkspaceData | null>(previewData ?? null);
-  const [loading, setLoading] = useState(!previewData);
+  const [data, setData] = useState<WorkspaceData | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [busy, setBusy] = useState(false);
@@ -87,17 +96,26 @@ export default function Workspace({
   const [page, setPage] = useState(1);
   const [week, setWeek] = useState(0);
   const [requirementsOpen, setRequirementsOpen] = useState(false);
+  const [resetOpen, setResetOpen] = useState(false);
+  const [billingOpen, setBillingOpen] = useState(false);
+  const [history, setHistory] = useState<LocalState["history"] | null>(null);
   const sidebarRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const [updated, setUpdated] = useState<Date | null>(null);
   const load = useCallback(
     async (signal?: AbortSignal) => {
       if (previewData) {
-        setData(previewData);
-        setLoading(false);
-        setSuccess(
-          "Development preview refreshed. Sample records are unchanged; live refresh needs Supabase.",
-        );
+        try {
+          setData(await readLocalWorkspace(initialProfile.role));
+          setUpdated(new Date());
+          setError("");
+        } catch (e) {
+          setError(
+            e instanceof Error ? e.message : "Unable to load local test data.",
+          );
+        } finally {
+          setLoading(false);
+        }
         return;
       }
       try {
@@ -122,10 +140,25 @@ export default function Workspace({
         if (!signal?.aborted) setLoading(false);
       }
     },
-    [previewData],
+    [previewData, initialProfile.role],
   );
   useEffect(() => {
-    if (previewData) return;
+    if (previewData) {
+      void load();
+      const refresh = () => void load();
+      const channel =
+        typeof BroadcastChannel !== "undefined"
+          ? new BroadcastChannel(LOCAL_CHANNEL)
+          : null;
+      if (channel) channel.onmessage = refresh;
+      window.addEventListener(LOCAL_CHANGE, refresh);
+      window.addEventListener("focus", refresh);
+      return () => {
+        channel?.close();
+        window.removeEventListener(LOCAL_CHANGE, refresh);
+        window.removeEventListener("focus", refresh);
+      };
+    }
     const c = new AbortController();
     void load(c.signal);
     const timer = setInterval(() => {
@@ -142,17 +175,25 @@ export default function Workspace({
     body: unknown,
     message: string,
   ) => {
-    if (previewData) {
-      setSuccess("");
-      setError(
-        "Development preview: this action requires live database access. No records, approvals, bookings, messages, or payments were changed.",
-      );
-      return null;
-    }
     setBusy(true);
     setError("");
     setSuccess("");
     try {
+      if (previewData) {
+        if (url === "/api/billing") {
+          setBillingOpen(true);
+          return { localBilling: true };
+        }
+        const response = await localRequest(
+          initialProfile.role,
+          url,
+          method,
+          body as Record<string, unknown>,
+        );
+        await load();
+        setSuccess("Simulated · " + message + " Saved in this browser only.");
+        return response;
+      }
       const r = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -457,7 +498,7 @@ export default function Workspace({
               }
               onClick={async () => {
                 if (previewData) {
-                  window.location.assign("/login");
+                  window.location.assign("/");
                   return;
                 }
                 const result = await request(
@@ -494,7 +535,7 @@ export default function Workspace({
             {previewData && <span className="preview-indicator">PREVIEW</span>}
             <span className="today">
               {previewData
-                ? "Screen review · sample data"
+                ? "Local test workspace"
                 : updated
                   ? "Updated " +
                     updated.toLocaleTimeString("en-US", {
@@ -533,7 +574,8 @@ export default function Workspace({
                 DEVELOPMENT PREVIEW
               </div>
               <p>
-                Fictional records · screen review only · changes are not saved
+                Simulated operations · saved in this browser · shared across
+                test portals
               </p>
               <div className="portal-switcher" aria-label="Review portal">
                 {(["facility", "nurse", "admin"] as const).map((r) => (
@@ -547,6 +589,31 @@ export default function Workspace({
                   </Link>
                 ))}
               </div>
+              <button
+                className="development-info"
+                onClick={async () => {
+                  try {
+                    setHistory(await readLocalHistory());
+                  } catch (e) {
+                    setError(
+                      e instanceof Error
+                        ? e.message
+                        : "Unable to read activity.",
+                    );
+                  }
+                }}
+              >
+                Local activity
+              </button>
+              <button
+                className="development-info"
+                onClick={() => setResetOpen(true)}
+              >
+                Reset local test data
+              </button>
+              <Link className="development-info" href="/">
+                Home
+              </Link>
               <button
                 className="development-info"
                 onClick={() => setRequirementsOpen(true)}
@@ -568,10 +635,10 @@ export default function Workspace({
               <p>
                 {tab === "Overview"
                   ? previewData
-                    ? "Review the actual workspace design using clearly labeled sample records."
+                    ? "Use the application with fictional records saved in this browser."
                     : "Your live staffing workspace. Every shift and application is stored securely."
                   : previewData
-                    ? "Screen review only. Changes and approvals require live database access."
+                    ? "Local test workflow. Requests, approvals and other changes are simulated and saved in this browser."
                     : "Your workspace data is protected by account and facility permissions."}
               </p>
             </div>
@@ -613,10 +680,15 @@ export default function Workspace({
           )}
           {!loading && !data && (
             <section className="panel resource-panel">
-              <h2>Unable to retrieve workspace data</h2>
+              <h2>
+                {previewData
+                  ? "Local test storage unavailable"
+                  : "Unable to retrieve workspace data"}
+              </h2>
               <p>
-                The connection or database schema needs attention. No sample
-                data has been substituted.
+                {previewData
+                  ? "Allow browser storage for STAFTIFY and reload. You can also reset local test data above. No live data will be changed."
+                  : "The connection or database schema needs attention. No sample data has been substituted."}
               </p>
               <button className="primary" onClick={() => void load()}>
                 Retry connection
@@ -632,13 +704,13 @@ export default function Workspace({
                     <strong>
                       {facility.verification_status === "verified"
                         ? previewData
-                          ? "Sample facility · verified state"
+                          ? "Local test facility · verified"
                           : "Facility verified"
                         : "Facility review " + facility.verification_status}
                     </strong>
                     <p>
                       {previewData
-                        ? "This illustrates a verified facility with an active plan. Real publishing requires live database and billing access."
+                        ? "Local publishing, bookings, attendance and approvals are simulated. Your changes persist across these test portals."
                         : facility.verification_status !== "verified"
                           ? "You can prepare draft shifts now. An administrator must verify the facility before publication."
                           : !["active", "trialing"].includes(
@@ -732,7 +804,7 @@ export default function Workspace({
                           <strong>People-first staffing</strong>
                           <span>
                             {previewData
-                              ? "Development screen review"
+                              ? "Persistent local testing"
                               : "Securely connected"}
                           </span>
                         </div>
@@ -780,7 +852,7 @@ export default function Workspace({
                         <strong>{x.value}</strong>
                         <small>
                           {previewData
-                            ? "Illustrative sample records"
+                            ? "Persistent local test records"
                             : "From your accessible workspace records"}
                         </small>
                       </article>
@@ -809,7 +881,7 @@ export default function Workspace({
                       <p>
                         {role === "facility"
                           ? "Create a draft, review the details, and publish when ready."
-                          : "Search real opportunities from verified facilities."}
+                          : "Search opportunities from verified facilities."}
                       </p>
                     </div>
                     <button
@@ -1300,10 +1372,25 @@ export default function Workspace({
                 </section>
               )}
               {tab === "Timesheets" && (
-                <AttendancePanel data={data} busy={busy} action={action} />
+                <AttendancePanel
+                  key={
+                    previewData
+                      ? data.shifts.map((s) => s.updated_at).join("|")
+                      : undefined
+                  }
+                  data={data}
+                  busy={busy}
+                  action={action}
+                  simulated={!!previewData}
+                />
               )}
               {tab === "Profile" && (
                 <ProfessionalProfile
+                  key={JSON.stringify([
+                    data.profile,
+                    data.nurse_details,
+                    data.nurse_credentials,
+                  ])}
                   data={data}
                   busy={busy}
                   request={request}
@@ -1447,6 +1534,106 @@ export default function Workspace({
           </footer>
         </main>
       </div>
+      {resetOpen && (
+        <Dialog
+          title="Reset local test data?"
+          onClose={() => setResetOpen(false)}
+        >
+          <p>
+            This clears fictional shifts, requests, bookings, attendance and
+            local activity in this browser for all three test portals. Live
+            Supabase data is never affected.
+          </p>
+          <div className="heading-actions">
+            <button className="secondary" onClick={() => setResetOpen(false)}>
+              Keep local data
+            </button>
+            <button
+              className="primary"
+              disabled={busy}
+              onClick={async () => {
+                setBusy(true);
+                try {
+                  await resetLocalWorkspace();
+                  await load();
+                  setResetOpen(false);
+                  setSuccess(
+                    "Local test data reset. You can start the workflow again.",
+                  );
+                } catch (e) {
+                  setError(e instanceof Error ? e.message : "Unable to reset.");
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            >
+              Confirm reset
+            </button>
+          </div>
+        </Dialog>
+      )}
+      {history && (
+        <Dialog title="Simulated activity" onClose={() => setHistory(null)}>
+          <p>
+            Local test operations, newest first. No real accounts, payments, or
+            messages are involved.
+          </p>
+          {history.length ? (
+            history.map((event) => (
+              <article className="notification-card" key={event.id}>
+                <div>
+                  <strong>{event.operation}</strong>
+                  <p>
+                    {event.actor} · {new Date(event.at).toLocaleString()}
+                  </p>
+                </div>
+              </article>
+            ))
+          ) : (
+            <p>No local operations yet. Request a shift to get started.</p>
+          )}
+        </Dialog>
+      )}
+      {billingOpen && (
+        <Dialog
+          title="Simulated subscription management"
+          onClose={() => setBillingOpen(false)}
+        >
+          {feedback}
+          <p>
+            STAFTIFY facility plan · $399/month. This local test control never
+            collects payment or contacts Stripe.
+          </p>
+          <p>
+            Local subscription: <strong>{facility?.subscription_status}</strong>
+          </p>
+          <button
+            className="primary"
+            disabled={busy}
+            onClick={async () => {
+              const r = await request(
+                "/development/subscription",
+                "POST",
+                {
+                  status: ["active", "trialing"].includes(
+                    facility?.subscription_status ?? "",
+                  )
+                    ? "inactive"
+                    : "active",
+                },
+                "Local subscription updated. No charge was made.",
+              );
+              if (r) setBillingOpen(false);
+            }}
+          >
+            {["active", "trialing"].includes(
+              facility?.subscription_status ?? "",
+            )
+              ? "Pause test subscription"
+              : "Activate test subscription"}
+          </button>
+        </Dialog>
+      )}
       {requirementsOpen && (
         <Dialog
           title="What needs live access?"
@@ -1454,8 +1641,11 @@ export default function Workspace({
         >
           <p>
             You are reviewing the actual Next.js workspace components with
-            fictional records. Navigation, filters, schedule browsing, form
-            validation, dialogs, and sample CSV exports work here.
+            fictional records. Shifts, requests, approvals, notifications,
+            profiles, attendance and verification work as simulated local
+            operations. Changes are stored in IndexedDB in this browser, persist
+            after reload, and are shared between test portals and tabs on this
+            origin.
           </p>
           <ul className="access-requirements">
             <li>
@@ -1463,9 +1653,9 @@ export default function Workspace({
               sign-in, and real account permissions.
             </li>
             <li>
-              <strong>Supabase database:</strong> saving/editing/publishing
-              shifts, applications, bookings, priority lists, notifications,
-              verification, OTP attendance, and timesheet approval.
+              <strong>Supabase database:</strong> real multi-user persistence
+              and server-enforced permissions. The local workflow is a
+              simulation, not a database connection.
             </li>
             <li>
               <strong>Stripe:</strong> facility subscription checkout and
@@ -1477,8 +1667,11 @@ export default function Workspace({
             </li>
           </ul>
           <p className="notice">
-            Preview mode never signs in as a sample account and never grants
-            access to the authenticated dashboard or API endpoints.
+            Test identities do not sign in through Supabase and cannot access
+            authenticated APIs. Only fictional information belongs here. Local
+            attendance ignores real shift-time windows; clock-out records at
+            least one simulated minute so you can test the complete flow now.
+            Reset local test data clears all three test portals in this browser.
           </p>
           <Link className="primary" href="/login">
             Open real sign-in
@@ -1572,6 +1765,19 @@ export default function Workspace({
             The facility pays the nurse directly. Publishing and booking require
             verified accounts and current credentials.
           </p>
+          {role === "nurse" &&
+            selectedShift.status === "open" &&
+            (!profile.verified ||
+              profile.credential !== selectedShift.specialty ||
+              profile.suspended) && (
+              <p className="notice">
+                {profile.suspended
+                  ? "This account is suspended. Ask an administrator to review it."
+                  : !profile.verified
+                    ? "Your professional credentials must be verified before applying."
+                    : `This shift requires ${selectedShift.specialty} credentials. Your profile lists ${profile.credential ?? "no credential"}.`}
+              </p>
+            )}
           <div className="heading-actions detail-actions">
             {role === "facility" &&
               selectedShift.facility_id === profile.facility_id && (
@@ -1629,7 +1835,9 @@ export default function Workspace({
               selectedShift.status === "open" &&
               (applications.some(
                 (a) =>
-                  a.nurse_id === profile.id && a.shift_id === selectedShift.id,
+                  a.nurse_id === profile.id &&
+                  a.shift_id === selectedShift.id &&
+                  ["pending", "accepted"].includes(a.status),
               ) ? (
                 <span className="badge">
                   Application:{" "}
@@ -1647,11 +1855,19 @@ export default function Workspace({
                   disabled={
                     busy ||
                     !profile.verified ||
+                    profile.suspended ||
                     profile.credential !== selectedShift.specialty
                   }
                   onClick={async () => {
-                    if (await action("apply", { shift_id: selectedShift.id }))
+                    if (await action("apply", { shift_id: selectedShift.id })) {
                       setSelected(null);
+                      navigate("My applications");
+                      setSuccess(
+                        previewData
+                          ? "Simulated · Shift requested. Your pending application is saved in this browser."
+                          : "Shift requested. Your application is pending facility approval.",
+                      );
+                    }
                   }}
                 >
                   Apply for shift

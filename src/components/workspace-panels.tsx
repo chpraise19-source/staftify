@@ -177,10 +177,12 @@ export function AttendancePanel({
   data,
   busy,
   action,
+  simulated = false,
 }: {
   data: WorkspaceData;
   busy: boolean;
   action: Action;
+  simulated?: boolean;
 }) {
   const [selected, setSelected] = useState("");
   const [code, setCode] = useState("");
@@ -202,7 +204,9 @@ export function AttendancePanel({
       <section className="panel resource-panel">
         <h2>Timesheets & approval</h2>
         <p>
-          Attendance times are recorded by the database, not the device clock.
+          {simulated
+            ? "Simulated attendance uses this device’s clock and persists in this browser. Clock-out records at least one test minute."
+            : "Attendance times are recorded by the database, not the device clock."}
         </p>
         {data.timesheets.map((t) => {
           const s = data.shifts.find((s) => s.id === t.shift_id);
@@ -367,10 +371,9 @@ export function AttendancePanel({
             <div className="empty">No assigned shifts awaiting attendance.</div>
           )}
           <p className="notice">
-            Attendance is available from 30 minutes before the shift to 4 hours
-            after its end. Codes expire in 10 minutes, are single-use, and have
-            attempt limits. Recorded times require facility approval; no nurse
-            payment is collected here.
+            {simulated
+              ? "Local test codes expire in 10 minutes and are single-use. Real attendance windows are relaxed in this simulation so you can test future shifts now. No real attendance or pay is recorded."
+              : "Attendance is available from 30 minutes before the shift to 4 hours after its end. Codes expire in 10 minutes, are single-use, and have attempt limits. Recorded times require facility approval; no nurse payment is collected here."}
           </p>
         </section>
       )}
